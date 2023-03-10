@@ -106,9 +106,18 @@ def build(genuine_num, forgery_num):
     with open("sigComp2011_test_dataset_chinese.pkl", "wb") as f:
         pickle.dump(test_dataset, f)
 
+def load(train = True):
+    if(train):
+        with open("sigComp2011_train_dataset_chinese.pkl", "rb") as f:
+            train_dataset = pickle.load(f)
+        return train_dataset
+    else:
+        with open("sigComp2011_test_dataset_chinese.pkl", "rb") as f:
+            test_dataset = pickle.load(f)
+        return test_dataset
 
 if __name__ == '__main__':
-    build(17, 20)
+    # build(17, 20)
 #   加载数据
 #     with open("sigComp2011_train_dataset_chinese.pkl", "rb") as f:
 #         train_dataset = pickle.load(f)
