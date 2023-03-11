@@ -116,8 +116,8 @@ def load(train = True):
             test_dataset = pickle.load(f)
         return test_dataset
 
-if __name__ == '__main__':
-    # build(17, 20)
+# if __name__ == '__main__':
+# build(17, 20)
 #   加载数据
 #     with open("sigComp2011_train_dataset_chinese.pkl", "rb") as f:
 #         train_dataset = pickle.load(f)
