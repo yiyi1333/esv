@@ -120,14 +120,6 @@ def load(data_dir, train = True):
 
 if __name__ == '__main__':
     build(17, 20)
-#   加载数据
-#     with open("sigComp2011_train_dataset_chinese.pkl", "rb") as f:
-#         train_dataset = pickle.load(f)
-#     with open("sigComp2011_test_dataset_chinese.pkl", "rb") as f:
-#         test_dataset = pickle.load(f)
-#
-#     train_dataloader = data.DataLoader(train_dataset, batch_size=32, shuffle=False)
-#     test_dataloader = data.DataLoader(test_dataset, batch_size=32, shuffle=False)
-#
-#     for idx, (images, labels) in enumerate(train_dataloader):
-#         print(idx, images.shape, labels)
+
+# ToDo: target 归一化
+# ToDo: transform

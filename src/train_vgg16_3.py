@@ -20,11 +20,7 @@ if torch.cuda.is_available():
 gpu_available = torch.cuda.is_available()
 
 # 准备数据集
-train_dataset = dataset_build.load("../dataset", True, transform=transforms.Compose([
-        transforms.ToTensor(),
-        # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-    ]))
+train_dataset = dataset_build.load("../dataset", True)
 test_dataset = dataset_build.load("../dataset", False)
 
 # 准备数据加载器
@@ -32,9 +28,9 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # 准备模型VGG
-model = torchvision.models.vgg16(pretrained=False)
-model.classifier[6] = torch.nn.Linear(4096, 40, bias=True)
-# model = VGG_16.VGG16_3()
+# model = torchvision.models.vgg16(pretrained=False)
+# model.classifier[6] = torch.nn.Linear(4096, 40, bias=True)
+model = VGG_16.VGG16_3()
 # 模型放入GPU
 if gpu_available:
     model = model.cuda()
