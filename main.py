@@ -1,7 +1,13 @@
 import os
 
+import torch
+import torchvision
 from PIL import Image, ImageOps
+from torch.utils.data import DataLoader
 
+from net.VGG_16 import VGG16_3
+from dataset import dataset_build
+from dataset.dataset_build import SigComp2011_Dataset_Chinese
 forgery_path = 'images/Sig2011/Forgery'
 genuine_path = 'images/Sig2011/Genuine'
 
@@ -54,3 +60,25 @@ genuine_list = os.listdir(genuine_path)
 #             max_height = height
 #
 # print(max_width, max_height)
+
+# train_dataset = dataset_build.load("dataset", train=True)
+# test_dataset = dataset_build.load("dataset", train=False)
+#
+# train_loader = DataLoader(train_dataset, batch_size = 16, shuffle=True)
+#
+# print(len(train_dataset))
+# print(len(test_dataset))
+# for data in train_loader:
+#     image, target = data
+#     print(image.shape, target)
+
+
+# net = VGG16_3()
+# input = torch.ones(((16, 3, 224, 224)))
+# output = net(input)
+# print(output.shape)
+
+model = torchvision.models.vgg16(pretrained=False)
+print(model)
+model.classifier[6] = torch.nn.Linear(4096, 40, bias=True)
+print(model)

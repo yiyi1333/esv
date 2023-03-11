@@ -18,7 +18,7 @@ class SigComp2011_Dataset_Chinese(Dataset):
         self.transform = transform
 
     def __len__(self):
-        return len(self.images)
+        return len(self.labels)
 
     def __getitem__(self, idx):
         image = self.images[idx]
@@ -93,11 +93,13 @@ def build(genuine_num, forgery_num):
     # 生成数据集
     train_dataset = SigComp2011_Dataset_Chinese(train_images, train_labels, True, transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ]))
     test_dataset = SigComp2011_Dataset_Chinese(test_images, test_labels, False, transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ]))
 
     # 保存数据
@@ -106,18 +108,18 @@ def build(genuine_num, forgery_num):
     with open("sigComp2011_test_dataset_chinese.pkl", "wb") as f:
         pickle.dump(test_dataset, f)
 
-def load(train = True):
+def load(data_dir, train = True):
     if(train):
-        with open("sigComp2011_train_dataset_chinese.pkl", "rb") as f:
+        with open(data_dir + '/sigComp2011_train_dataset_chinese.pkl', "rb") as f:
             train_dataset = pickle.load(f)
         return train_dataset
     else:
-        with open("sigComp2011_test_dataset_chinese.pkl", "rb") as f:
+        with open(data_dir + '/sigComp2011_test_dataset_chinese.pkl', "rb") as f:
             test_dataset = pickle.load(f)
         return test_dataset
 
-# if __name__ == '__main__':
-# build(17, 20)
+if __name__ == '__main__':
+    build(17, 20)
 #   加载数据
 #     with open("sigComp2011_train_dataset_chinese.pkl", "rb") as f:
 #         train_dataset = pickle.load(f)

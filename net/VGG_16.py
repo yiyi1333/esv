@@ -45,7 +45,7 @@ class VGG16_3(nn.Module):
             nn.Linear(4096, 4096, bias=True),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5, inplace=False),
-            nn.Linear(4096, 20, bias=True),
+            nn.Linear(4096, 40, bias=True),
         )
 
     def forward(self, x):
@@ -97,7 +97,7 @@ class VGG16_1(nn.Module):
             nn.Linear(4096, 4096, bias=True),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5, inplace=False),
-            nn.Linear(4096, 20, bias=True),
+            nn.Linear(4096, 40, bias=True),
         )
 
     def forward(self, x):
@@ -105,9 +105,9 @@ class VGG16_1(nn.Module):
         return x
 
 
-if __name__ == '__main__':
-    vgg16_1 = VGG16_1()
-    # print(vgg16_3)
-    input = torch.ones((32, 1, 224, 224))
-    output = vgg16_1(input)
-    print(output.shape)
+# if __name__ == '__main__':
+#     vgg16_1 = VGG16_1()
+#     # print(vgg16_3)
+#     input = torch.ones((32, 1, 224, 224))
+#     output = vgg16_1(input)
+#     print(output.shape)
