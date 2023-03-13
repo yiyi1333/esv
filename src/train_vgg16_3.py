@@ -1,4 +1,5 @@
 import torch.cuda
+import torchvision
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
@@ -6,7 +7,7 @@ from dataset import dataset_build
 from net import VGG_16
 
 # 超参
-batch_size = 16 # 一次训练的样本数
+batch_size = 32 # 一次训练的样本数
 learning_rate = 0.001 # 学习率
 
 if torch.cuda.is_available():
@@ -41,7 +42,7 @@ optimzer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 # 训练
 total_train_step = 0
 total_test_step = 0
-epoch = 100
+epoch = 10000
 
 # tensorboard
 writer = SummaryWriter("../logs/vgg16_3/")
@@ -49,15 +50,15 @@ writer = SummaryWriter("../logs/vgg16_3/")
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))
 
-    model.train()
     # 训练过程
+    model.train()
     for data in train_loader:
         imgs, targets = data
         if gpu_available:
             imgs = imgs.cuda()
             targets = targets.cuda()
+        print(targets)
         outputs = model(imgs)
-        print(outputs.shape, targets.shape)
         loss = loss_func(outputs, targets)
 
         # 反向传播
@@ -70,7 +71,6 @@ for i in range(epoch):
         # 记录训练损失
         total_train_step += 1
         if total_train_step % 100 == 0:
-            print("第{}步训练，损失为{}".format(total_train_step, loss.item()))
             writer.add_scalar("train_loss", loss.item(), total_train_step)
 
     # 测试过程
@@ -99,9 +99,12 @@ for i in range(epoch):
     total_test_step += 1
 
     # 保存模型
-    torch.save(model.state_dict(), "../model/vgg16_3/vgg16_3_{}.pth".format(i + 1))
+    if i % 100 == 0:
+        torch.save(model.state_dict(), "../model/vgg16_3/vgg16_3_{}.pth".format(i + 1))
     print("\n")
 
 writer.close()
 
 
+# ToDo 1. 数据预处理
+# ToDo 2. 数据增强
