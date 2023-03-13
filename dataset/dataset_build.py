@@ -60,12 +60,12 @@ def build(genuine_num, forgery_num):
 
             if(genuine_map[num] <= genuine_num):
                 train_images.append(image)
-                train_labels.append((int(num) - 1) * 2 + 1)
+                train_labels.append((int(num) - 1) * 2)
             else:
                 test_images.append(image)
-                test_labels.append((int(num) - 1) * 2 + 1)
+                test_labels.append((int(num) - 1) * 2)
 
-            print(filename, 'label:', (int(num) - 1) * 2 + 1)
+            print(filename, 'label:', (int(num) - 1) * 2)
 
     # 伪造签名
     image_list = os.listdir(images_dir_forgery)
@@ -85,11 +85,11 @@ def build(genuine_num, forgery_num):
                 forgery_map[num] += 1
             if(forgery_map[num] <= forgery_num):
                 train_images.append(image)
-                train_labels.append((int(num) - 1) * 2 + 2)
+                train_labels.append((int(num) - 1) * 2 + 1)
             else:
                 test_images.append(image)
-                test_labels.append((int(num) - 1) * 2 + 2)
-            print(filename, 'label:', (int(num) - 1) * 2 + 2)
+                test_labels.append((int(num) - 1) * 2 + 1)
+            print(filename, 'label:', (int(num) - 1) * 2 + 1)
 
     # 生成数据集
     train_dataset = SigComp2011_Dataset_Chinese(train_images, train_labels, True)
