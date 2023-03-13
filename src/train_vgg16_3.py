@@ -50,6 +50,7 @@ writer = SummaryWriter("../logs/vgg16_3/")
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))
 
+    model.train()
     # 训练过程
     for data in train_loader:
         imgs, targets = data
@@ -73,7 +74,9 @@ for i in range(epoch):
             writer.add_scalar("train_loss", loss.item(), total_train_step)
 
     # 测试过程
+    model.eval()
     total_test_loss = 0
+    total_accuracy = 0
     with torch.no_grad():
         for data in test_loader:
             imgs, targets = data
@@ -81,18 +84,23 @@ for i in range(epoch):
                 imgs = imgs.cuda()
                 targets = targets.cuda()
             outputs = model(imgs)
+            # loss
             loss = loss_func(outputs, targets)
             total_test_loss += loss.item()
+            # acc
+            accuracy = (outputs.argmax(1) == targets).sum().item()
+            total_accuracy += accuracy
 
     # 记录测试损失
     print("第{}轮测试，损失为{}".format(i + 1, total_test_loss))
+    print("第{}轮测试，准确率为{}".format(i + 1, total_accuracy / len(test_dataset)))
     writer.add_scalar("test_loss", total_test_loss, total_test_step)
+    writer.add_scalar("test_acc", total_accuracy / len(test_dataset), total_test_step)
     total_test_step += 1
 
     # 保存模型
     torch.save(model.state_dict(), "../model/vgg16_3/vgg16_3_{}.pth".format(i + 1))
     print("\n")
-
 
 writer.close()
 
