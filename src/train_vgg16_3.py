@@ -4,7 +4,6 @@ from torch.utils.tensorboard import SummaryWriter
 
 from dataset import dataset_build
 from net import VGG_16
-from dataset.dataset_build import SigComp2011_Dataset_Chinese
 
 # 超参
 batch_size = 16 # 一次训练的样本数
@@ -58,6 +57,7 @@ for i in range(epoch):
             imgs = imgs.cuda()
             targets = targets.cuda()
         outputs = model(imgs)
+        print(outputs.shape, targets.shape)
         loss = loss_func(outputs, targets)
 
         # 反向传播
