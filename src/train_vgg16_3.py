@@ -1,15 +1,11 @@
-import numpy as np
 import torch.cuda
-import torchvision
-from PIL import Image
+from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from torchvision.transforms import transforms
 
+from dataset import dataset_build
+from net import VGG_16
 from dataset.dataset_build import SigComp2011_Dataset_Chinese
 
-from net import VGG_16
-from dataset import dataset_build
-from torch.utils.data import DataLoader
 # 超参
 batch_size = 16 # 一次训练的样本数
 learning_rate = 0.001 # 学习率

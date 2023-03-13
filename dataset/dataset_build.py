@@ -11,11 +11,10 @@ from torchvision.transforms import transforms
 
 
 class SigComp2011_Dataset_Chinese(Dataset):
-    def __init__(self, images, labels, transform=None, train=True):
+    def __init__(self, images, labels, train=True):
         self.labels = labels
         self.images = images
         self.train = train
-        self.transform = transform
 
     def __len__(self):
         return len(self.labels)
@@ -23,12 +22,11 @@ class SigComp2011_Dataset_Chinese(Dataset):
     def __getitem__(self, idx):
         image = self.images[idx]
         label = self.labels[idx]
-        if self.transform is not None:
-            image = self.transform(image)
+        image = transforms.ToTensor()(image)
         return image, label
 
-    def get_transform(self):
-        return self.transform
+    # def get_transform(self):
+    #     return self.transform
 
 
 def build(genuine_num, forgery_num):
@@ -55,8 +53,8 @@ def build(genuine_num, forgery_num):
             else:
                 genuine_map[num] += 1
 
-            # Image，以原图为中心，填充为1274 * 1274，使用白色填充
-            image = ImageOps.pad(image, (1300, 1300), color=(255, 255, 255))
+            # Image，以原图为中心，填充为1300 * 1300，使用白色填充
+            image = ImageOps.pad(image, (1300, 1300), color=(254, 254, 254))
             # resize 为224 * 224
             image = image.resize((224, 224))
 
@@ -77,7 +75,7 @@ def build(genuine_num, forgery_num):
             num = filename.split('_')[0][-3:]
             # 取字符串label的最后三个字符
             image = Image.open(os.path.join(images_dir_forgery, filename))
-            image = ImageOps.pad(image, (1300, 1300), color=(255, 255, 255))
+            image = ImageOps.pad(image, (1300, 1300), color=(254, 254, 254))
             # resize 为224 * 224
             image = image.resize((224, 224))
 
@@ -94,14 +92,8 @@ def build(genuine_num, forgery_num):
             print(filename, 'label:', (int(num) - 1) * 2 + 2)
 
     # 生成数据集
-    train_dataset = SigComp2011_Dataset_Chinese(train_images, train_labels, transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ]), True)
-    test_dataset = SigComp2011_Dataset_Chinese(test_images, test_labels, transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-    ]), False)
+    train_dataset = SigComp2011_Dataset_Chinese(train_images, train_labels, True)
+    test_dataset = SigComp2011_Dataset_Chinese(test_images, test_labels,  False)
 
     # 保存数据
     with open("sigComp2011_train_dataset_chinese.pkl", "wb") as f:
@@ -111,7 +103,7 @@ def build(genuine_num, forgery_num):
 
 def load(data_dir, train = True):
     if(train):
-        with open(data_dir + 'sigComp2011_train_dataset_chinese.pkl', "rb") as f:
+        with open(data_dir + '/sigComp2011_train_dataset_chinese.pkl', "rb") as f:
             train_dataset = pickle.load(f)
         return train_dataset
     else:
@@ -119,17 +111,6 @@ def load(data_dir, train = True):
             test_dataset = pickle.load(f)
         return test_dataset
 
-if __name__ == '__main__':
-    build(17, 20)
-    # train_dataset = load('', True)
-    # print(train_dataset.get_transform())
-    # train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True, num_workers=0)
-    # for i, data in enumerate(train_dataloader, 0):
-    #     inputs, labels = data
-    #     print(inputs)
-    #     print(labels.shape)
-    #     print(labels)
-    #     break
 
 # ToDo: target 归一化
 # ToDo: transform

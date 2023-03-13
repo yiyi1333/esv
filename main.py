@@ -14,17 +14,17 @@ from dataset.dataset_build import SigComp2011_Dataset_Chinese
 # forgery_list = os.listdir(forgery_path)
 # genuine_list = os.listdir(genuine_path)
 
-train_data = torchvision.datasets.CIFAR10(root='../data', train=True, download=True,
-                                          transform=torchvision.transforms.ToTensor())
-test_data = torchvision.datasets.CIFAR10(root='../data', train=False, download=True,
-                                         transform=torchvision.transforms.ToTensor())
-
-train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
-
-for data in train_loader:
-    imgs, targets = data
-    print(imgs.shape)
-    print(targets)
+# train_data = torchvision.datasets.CIFAR10(root='../data', train=True, download=True,
+#                                           transform=torchvision.transforms.ToTensor())
+# test_data = torchvision.datasets.CIFAR10(root='../data', train=False, download=True,
+#                                          transform=torchvision.transforms.ToTensor())
+#
+# train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
+#
+# for data in train_loader:
+#     imgs, targets = data
+#     print(imgs.shape)
+#     print(targets)
 
 # 打开0.jpg
 # image = Image.open('src/0.jpg')
@@ -34,3 +34,8 @@ for data in train_loader:
 #     transforms.Normalize((0.5, 0.5, 0.5),
 #                          (0.5, 0.5, 0.5))
 # ])(image)
+# image = Image.open('001_1.png')
+# image = transforms.ToTensor()(image)
+# print(image)
+
+dataset_build.build(17, 20)
