@@ -3,27 +3,17 @@ import random
 
 from PIL import Image, ImageOps
 
-
-# img = Image.open('../images/Sig2011/Genuine/001_1.png')
-# # 将图片顺时针或逆时针随机旋转10度以内
-# img = img.rotate(random.randint(-10, 10))
-# # 将图片放大或缩小到原来的0.9~1.1倍
-# img = img.resize((int(img.size[0] * random.uniform(0.9, 1.1)), int(img.size[1] * random.uniform(0.9, 1.1))))
-# # 将图片随机平移0~20像素
-# img = ImageOps.expand(img, border=random.randint(0, 20), fill=(254, 254, 254))
-# img.show()
-
 def enhancement(img):
-    # 将图片顺时针或逆时针随机旋转10度以内
-    img = img.rotate(random.randint(-10, 10))
+    # 将图片顺时针或逆时针随机旋转8度以内,使用白色填充
+    img = img.rotate(random.randint(-8, 8), fillcolor=(254, 254, 254))
     # 将图片放大或缩小到原来的0.9~1.1倍
-    img = img.resize((int(img.size[0] * random.uniform(0.9, 1.1)), int(img.size[1] * random.uniform(0.9, 1.1))))
-    # 将图片随机平移0~20像素
-    img = ImageOps.expand(img, border=random.randint(0, 20), fill=(254, 254, 254))
+    img = img.resize((int(img.size[0] * random.uniform(0.8, 1.1)), int(img.size[1] * random.uniform(0.9, 1.1))))
+    # 将图片随机平移0~40像素
+    img = ImageOps.expand(img, border=random.randint(0, 40), fill=(254, 254, 254))
     return img
 
 
-enhance_num = 10
+enhance_num = 8
 
 # 获取Sig2011的目录
 images_dir_genuine = '../images/Sig2011/Genuine'
@@ -38,8 +28,11 @@ genuine_source_list = os.listdir(images_dir_genuine)
 forgery_source_list = os.listdir(images_dir_forgery)
 
 genuine_data_map = {}
+pro = 0
+len = len(genuine_source_list) + len(forgery_source_list)
 for file in genuine_source_list:
-    # print(images_dir_genuine + '/' + file)
+    pro += 1
+    print("enhancement progress: " + str(pro / len * 100) + "%")
     num = file.split('_')[0]
     image = Image.open(images_dir_genuine + '/' + file)
     if (num not in genuine_data_map):
@@ -54,10 +47,15 @@ for file in genuine_source_list:
         image_new = enhancement(image)
         genuine_data_map[num] += 1
         index += 1
-        image.save(target_dir_genuine + '/' + num + '_' + str(index) + '.png')
+        image_new.save(target_dir_genuine + '/' + num + '_' + str(index) + '.png')
+
+
+print("enhancement progress 50% !")
 
 forgerty_data_map = {}
 for file in forgery_source_list:
+    pro += 1
+    print("enhancement progress: " + str(pro / len * 100) + "%")
     num = file.split('_')[0]
     image = Image.open(images_dir_forgery + '/' + file)
     if(num not in forgerty_data_map):
@@ -72,6 +70,6 @@ for file in forgery_source_list:
         image_new = enhancement(image)
         forgerty_data_map[num] += 1
         index += 1
-        image.save(target_dir_forgery + '/' + num + '_' + str(index) + '.png')
+        image_new.save(target_dir_forgery + '/' + num + '_' + str(index) + '.png')
 
-
+print("enhancement done!")
