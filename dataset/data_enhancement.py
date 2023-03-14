@@ -23,7 +23,7 @@ def enhancement(img):
     return img
 
 
-enhance_num = 5
+enhance_num = 10
 
 # 获取Sig2011的目录
 images_dir_genuine = '../images/Sig2011/Genuine'
@@ -56,6 +56,22 @@ for file in genuine_source_list:
         index += 1
         image.save(target_dir_genuine + '/' + num + '_' + str(index) + '.png')
 
-
+forgerty_data_map = {}
+for file in forgery_source_list:
+    num = file.split('_')[0]
+    image = Image.open(images_dir_forgery + '/' + file)
+    if(num not in forgerty_data_map):
+        forgerty_data_map[num] = 1
+    else:
+        forgerty_data_map[num] += 1
+    index = forgerty_data_map[num]
+    # 将图片image存储到目标目录
+    image.save(target_dir_forgery + '/' + num + '_' + str(index) + '.png')
+    # 对图片进行增强
+    for i in range(enhance_num):
+        image_new = enhancement(image)
+        forgerty_data_map[num] += 1
+        index += 1
+        image.save(target_dir_forgery + '/' + num + '_' + str(index) + '.png')
 
 
