@@ -3,16 +3,6 @@ import random
 
 from PIL import Image, ImageOps
 
-
-# img = Image.open('../images/Sig2011/Genuine/001_1.png')
-# # 将图片顺时针或逆时针随机旋转10度以内
-# img = img.rotate(random.randint(-10, 10))
-# # 将图片放大或缩小到原来的0.9~1.1倍
-# img = img.resize((int(img.size[0] * random.uniform(0.9, 1.1)), int(img.size[1] * random.uniform(0.9, 1.1))))
-# # 将图片随机平移0~20像素
-# img = ImageOps.expand(img, border=random.randint(0, 20), fill=(254, 254, 254))
-# img.show()
-
 def enhancement(img):
     # 将图片顺时针或逆时针随机旋转10度以内
     img = img.rotate(random.randint(-10, 10))

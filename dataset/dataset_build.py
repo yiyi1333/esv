@@ -11,10 +11,11 @@ from torchvision.transforms import transforms
 
 
 class SigComp2011_Dataset_Chinese(Dataset):
-    def __init__(self, images, labels, train=True):
+    def __init__(self, images, labels, train=True, transform=None):
         self.labels = labels
         self.images = images
         self.train = train
+        self.transform= transform
 
     def __len__(self):
         return len(self.labels)
@@ -22,17 +23,18 @@ class SigComp2011_Dataset_Chinese(Dataset):
     def __getitem__(self, idx):
         image = self.images[idx]
         label = self.labels[idx]
-        image = transforms.ToTensor()(image)
+        # 将图片转换为tensor, 归一化, 高斯滤波
+        image = self.transform(image)
         return image, label
 
-    # def get_transform(self):
-    #     return self.transform
 
 
 def build(genuine_num, forgery_num):
     # 数据路径
     images_dir_forgery = '../images/Sig2011/Forgery'
     images_dir_genuine = '../images/Sig2011/Genuine'
+    # images_dir_forgery = '../images/Sig2011_enhancement/Forgery'
+    # images_dir_genuine = '../images/Sig2011_enhancement/Genuine'
     # 读取数据, 生成数据集存储到本地
     # 真实签名
     image_list = os.listdir(images_dir_genuine)
@@ -92,8 +94,16 @@ def build(genuine_num, forgery_num):
             print(filename, 'label:', (int(num) - 1) * 2 + 1)
 
     # 生成数据集
-    train_dataset = SigComp2011_Dataset_Chinese(train_images, train_labels, True)
-    test_dataset = SigComp2011_Dataset_Chinese(test_images, test_labels,  False)
+    train_dataset = SigComp2011_Dataset_Chinese(train_images, train_labels, True, transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,), (0.5,)),
+            transforms.GaussianBlur(3, (1.0, 1.0))
+        ]))
+    test_dataset = SigComp2011_Dataset_Chinese(test_images, test_labels,  False, transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5,), (0.5,)),
+            transforms.GaussianBlur(3, (1.0, 1.0))
+        ]))
 
     # 保存数据
     with open("sigComp2011_train_dataset_chinese.pkl", "wb") as f:
@@ -112,5 +122,3 @@ def load(data_dir, train = True):
         return test_dataset
 
 
-# ToDo: target 归一化
-# ToDo: transform
