@@ -13,9 +13,15 @@ from torchvision.transforms import transforms
 class SigComp2011_Dataset_Chinese(Dataset):
     def __init__(self, images, labels, train=True, transform=None):
         self.labels = labels
-        self.images = images
+        # self.images = images
         self.train = train
         self.transform= transform
+
+        img = {}
+        for image in images:
+            img.add(self.transform(image))
+
+        self.images = img
 
     def __len__(self):
         return len(self.labels)
@@ -24,7 +30,7 @@ class SigComp2011_Dataset_Chinese(Dataset):
         image = self.images[idx]
         label = self.labels[idx]
         # 将图片转换为tensor, 归一化, 高斯滤波
-        image = self.transform(image)
+        # image = self.transform(image)
         return image, label
 
 
