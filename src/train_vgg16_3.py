@@ -7,8 +7,8 @@ from dataset import dataset_build
 from net import VGG_16
 
 # 超参
-batch_size = 32 # 一次训练的样本数
-learning_rate = 0.001 # 学习率
+batch_size = 64 # 一次训练的样本数
+learning_rate = 0.01 # 学习率
 
 if torch.cuda.is_available():
     #打印GPU信息
@@ -42,7 +42,7 @@ optimzer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 # 训练
 total_train_step = 0
 total_test_step = 0
-epoch = 10000
+epoch = 200
 
 # tensorboard
 writer = SummaryWriter("../logs/vgg16_3/")
@@ -57,7 +57,7 @@ for i in range(epoch):
         if gpu_available:
             imgs = imgs.cuda()
             targets = targets.cuda()
-        print(targets)
+        # print(targets)
         outputs = model(imgs)
         loss = loss_func(outputs, targets)
 
@@ -70,7 +70,7 @@ for i in range(epoch):
 
         # 记录训练损失
         total_train_step += 1
-        if total_train_step % 100 == 0:
+        if total_train_step % 10 == 0:
             writer.add_scalar("train_loss", loss.item(), total_train_step)
 
     # 测试过程
@@ -92,11 +92,12 @@ for i in range(epoch):
             total_accuracy += accuracy
 
     # 记录测试损失
+    total_test_step += 1
     print("第{}轮测试，损失为{}".format(i + 1, total_test_loss))
     print("第{}轮测试，准确率为{}".format(i + 1, total_accuracy / len(test_dataset)))
     writer.add_scalar("test_loss", total_test_loss, total_test_step)
     writer.add_scalar("test_acc", total_accuracy / len(test_dataset), total_test_step)
-    total_test_step += 1
+
 
     # 保存模型
     if i % 100 == 0:
