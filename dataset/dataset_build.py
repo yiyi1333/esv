@@ -13,7 +13,6 @@ from torchvision.transforms import transforms
 class SigComp2011_Dataset_Chinese(Dataset):
     def __init__(self, images, labels, train=True, transform=None):
         self.labels = labels
-        # self.images = images
         self.train = train
         self.transform= transform
         self.images = images
@@ -24,24 +23,24 @@ class SigComp2011_Dataset_Chinese(Dataset):
     def __getitem__(self, idx):
         image = self.images[idx]
         label = self.labels[idx]
-        # 将图片转换为tensor, 归一化, 高斯滤波
-        # image = self.transform(image)
         return image, label
 
 
+def to_grayscale(img):
+    return torch.mean(img, dim=0, keepdim=True)
 
 def build(genuine_num, forgery_num):
     # 图像处理方法
     tran = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize((0.5,), (0.5,)),
-            transforms.GaussianBlur(3, (1.0, 1.0))
+            transforms.ToTensor()
+            # transforms.Normalize((0.5,), (0.5,))
+            # transforms.GaussianBlur(3, (1.0, 1.0))
         ])
     # 数据路径
-    # images_dir_forgery = '../images/Sig2011/Forgery'
-    # images_dir_genuine = '../images/Sig2011/Genuine'
-    images_dir_forgery = '../images/Sig2011_enhancement/Forgery'
-    images_dir_genuine = '../images/Sig2011_enhancement/Genuine'
+    images_dir_forgery = '../images/Sig2011/Forgery'
+    images_dir_genuine = '../images/Sig2011/Genuine'
+    # images_dir_forgery = '../images/Sig2011_enhancement/Forgery'
+    # images_dir_genuine = '../images/Sig2011_enhancement/Genuine'
     # 读取数据, 生成数据集存储到本地
     # 真实签名
     image_list = os.listdir(images_dir_genuine)
@@ -66,16 +65,22 @@ def build(genuine_num, forgery_num):
             else:
                 genuine_map[num] += 1
 
-            # Image，以原图为中心，填充为1300 * 1300，使用白色填充
-            image = ImageOps.pad(image, (1300, 1300))
+            # Image，以原图为中心，填充为正方形，使用白色填充
+            edge = max(image.size[0], image.size[1])
+            image = ImageOps.pad(image, (edge, edge), color=(255, 255, 255))
             # resize 为224 * 224
             image = image.resize((224, 224))
+            # totensor
+            image = tran(image)
+            # 通道压缩
+            to_gray = transforms.Lambda(lambda x: to_grayscale(x))
+            image = to_gray(image)
 
             if(genuine_map[num] <= genuine_num):
-                train_images.append(tran(image))
+                train_images.append(image)
                 train_labels.append((int(num) - 1) * 2)
             else:
-                test_images.append(tran(image))
+                test_images.append(image)
                 test_labels.append((int(num) - 1) * 2)
 
             print(filename, 'label:', (int(num) - 1) * 2)
@@ -93,19 +98,26 @@ def build(genuine_num, forgery_num):
 
             # 取字符串label的最后三个字符
             image = Image.open(os.path.join(images_dir_forgery, filename))
-            image = ImageOps.pad(image, (1300, 1300), color=(254, 254, 254))
+            # Image，以原图为中心，填充为正方形，使用白色填充
+            edge = max(image.size[0], image.size[1])
+            image = ImageOps.pad(image, (edge, edge), color=(255, 255, 255))
             # resize 为224 * 224
             image = image.resize((224, 224))
+            # totensor
+            image = tran(image)
+            # 通道压缩
+            to_gray = transforms.Lambda(lambda x: to_grayscale(x))
+            image = to_gray(image)
 
             if (num not in forgery_map):
                 forgery_map[num] = 1
             else:
                 forgery_map[num] += 1
             if(forgery_map[num] <= forgery_num):
-                train_images.append(tran(image))
+                train_images.append((image))
                 train_labels.append((int(num) - 1) * 2 + 1)
             else:
-                test_images.append(tran(image))
+                test_images.append((image))
                 test_labels.append((int(num) - 1) * 2 + 1)
             print(filename, 'label:', (int(num) - 1) * 2 + 1)
 

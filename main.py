@@ -9,33 +9,59 @@ import random
 from torchvision import transforms
 
 
-# import torch
+import torch
 # import torchvision.transforms as transforms
 # from PIL import Image
 #
-# # 加载图像并将其转换为 PyTorch 张量
-# img = Image.open('src/0.jpg')
+# 加载图像并将其转换为 PyTorch 张量
+# img = Image.open('1.png')
 # to_tensor = transforms.ToTensor()
 # tensor_img = to_tensor(img)
 #
 # # 定义一个函数，该函数将三通道张量转换为单通道张量
-# def to_grayscale(img):
-#     return torch.mean(img, dim=0, keepdim=True)
+def to_grayscale(img):
+    return torch.mean(img, dim=0, keepdim=True)
 #
-# # 使用 Lambda 转换将三通道张量转换为单通道张量
+# 使用 Lambda 转换将三通道张量转换为单通道张量
 # to_gray = transforms.Lambda(lambda x: to_grayscale(x))
 # gray_tensor = to_gray(tensor_img)
-#
-# # 显示结果
-# print('Original tensor shape:', tensor_img.shape)
-# print('Grayscale tensor shape:', gray_tensor.shape)
 
-def enhancement(img):
-    # 将图片顺时针或逆时针随机旋转8度以内,使用白色填充
-    img = img.rotate(random.randint(-8, 8), fillcolor=(254, 254, 254))
-    # 将图片放大或缩小到原来的0.9~1.1倍
-    img = img.resize((int(img.size[0] * random.uniform(0.9, 1.1)), int(img.size[1] * random.uniform(0.9, 1.1))))
-    # 将图片随机平移0~40像素
-    img = ImageOps.expand(img, border=random.randint(0, 40), fill=(254, 254, 254))
-    return img
+# 显示结果
+# print('Original tensor shape:', tensor_img.shape)
+# print(tensor_img)
+# print('Grayscale tensor shape:', gray_tensor.shape)
+# print(gray_tensor)
+
+# def enhancement(img):
+#     # 将图片顺时针或逆时针随机旋转8度以内,使用白色填充
+#     img = img.rotate(random.randint(-8, 8), fillcolor=(254, 254, 254))
+#     # 将图片放大或缩小到原来的0.9~1.1倍
+#     img = img.resize((int(img.size[0] * random.uniform(0.9, 1.1)), int(img.size[1] * random.uniform(0.9, 1.1))))
+#     # 将图片随机平移0~40像素
+#     img = ImageOps.expand(img, border=random.randint(0, 40), fill=(254, 254, 254))
+#     return img
+
+
+tran = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5,), (0.5,)),
+        transforms.GaussianBlur(3, (1.0, 1.0))
+    ])
+# Image，以原图为中心，填充为正方形，使用白色填充
+image = Image.open('1.png')
+edge = max(image.size[0], image.size[1])
+image = ImageOps.pad(image, (edge, edge), color=(255, 255, 255))
+# resize 为224 * 224
+image = image.resize((224, 224))
+# totensor
+image = tran(image)
+# 通道压缩
+to_gray = transforms.Lambda(lambda x: to_grayscale(x))
+image = to_gray(image)
+print(image)
+
+# print(image.shape, image.type())
+# 将tensor单通道图像转换为PIL图像
+# image = transforms.ToPILImage()(image)
+# image.show()
 

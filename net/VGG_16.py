@@ -97,7 +97,10 @@ class VGG16_1(nn.Module):
             nn.Linear(4096, 4096, bias=True),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.5, inplace=False),
-            nn.Linear(4096, 10, bias=True),
+            nn.Linear(4096, 1000, bias=True),
+            nn.ReLU(inplace=True),
+            nn.Dropout(p=0.5, inplace=False),
+            nn.Linear(1000, 10, bias=True)
         )
 
     def forward(self, x):
