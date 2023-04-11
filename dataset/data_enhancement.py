@@ -5,11 +5,11 @@ from PIL import Image, ImageOps
 
 def enhancement(img):
     # 将图片顺时针或逆时针随机旋转8度以内,使用白色填充
-    img = img.rotate(random.randint(-8, 8), fillcolor=(255, 255, 255))
+    img = img.rotate(random.randint(-4, 4), fillcolor=(255, 255, 255))
     # 将图片放大或缩小到原来的0.9~1.1倍
     img = img.resize((int(img.size[0] * random.uniform(0.8, 1.1)), int(img.size[1] * random.uniform(0.9, 1.1))))
-    # 将图片随机平移0~40像素
-    img = ImageOps.expand(img, border=random.randint(0, 40), fill=(255, 255, 255))
+    # 将图片随机平移-40~40像素
+    img = ImageOps.expand(img, border=random.randint(-40, 40), fill=(255, 255, 255))
     return img
 
 

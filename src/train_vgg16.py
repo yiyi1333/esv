@@ -8,7 +8,7 @@ from net import VGG_16
 
 # 超参
 batch_size = 64 # 一次训练的样本数
-learning_rate = 0.01 # 学习率
+learning_rate = 0.001 # 学习率
 
 if torch.cuda.is_available():
     #打印GPU信息
@@ -24,9 +24,9 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # 准备模型VGG
-# model = torchvision.models.vgg16(pretrained=False)
-# model.classifier[6] = torch.nn.Linear(4096, 40, bias=True)
-model = VGG_16.VGG16_3()
+model = torchvision.models.vgg16(pretrained=True)
+model.classifier[6] = torch.nn.Linear(4096, 5, bias=True)
+# model = VGG_16.VGG16_3()
 # 模型放入GPU
 if gpu_available:
     model = model.cuda()
@@ -42,9 +42,9 @@ optimzer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 # 训练
 total_train_step = 0
 total_test_step = 0
-epoch = 200
+epoch = 100
 
-# tensorboard
+# tensorboard, 指定日志名称
 writer = SummaryWriter("../logs/vgg16_3/")
 
 for i in range(epoch):
@@ -100,8 +100,8 @@ for i in range(epoch):
 
 
     # 保存模型
-    if i % 100 == 0:
-        torch.save(model.state_dict(), "../model/vgg16_3/vgg16_3_{}.pth".format(i + 1))
+    if i % 10 == 0:
+        torch.save(model.state_dict(), "../model/vgg16/vgg16_{}.pth".format(i))
     print("\n")
 
 writer.close()

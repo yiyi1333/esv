@@ -5,7 +5,7 @@ from torchvision.transforms import ToPILImage
 from dataset.dataset_build import build, load
 
 if __name__ == '__main__':
-    build(17, 20)
+    build(170, 200)
     train_data = load('../dataset', True)
     train_loader = DataLoader(train_data, batch_size=1, shuffle=True)
     for data in train_loader:
@@ -15,4 +15,5 @@ if __name__ == '__main__':
         # imgs从tensor 转为 PIL.Image
         pil_image = ToPILImage()(imgs)
         pil_image.show()
-        break
+        print(targets)
+        # break
