@@ -25,9 +25,9 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # 准备模型VGG
-model = torchvision.models.vgg16(pretrained=True)
+model = torchvision.models.vgg19(pretrained=True)
 model.classifier[6] = torch.nn.Linear(4096, class_nums, bias=True)
-# model = VGG_16.VGG16_3()
+
 # 模型放入GPU
 if gpu_available:
     model = model.cuda()
@@ -46,7 +46,7 @@ total_test_step = 0
 epoch = 101
 
 # tensorboard, 指定日志名称
-writer = SummaryWriter("../logs/vgg16/5class2/")
+writer = SummaryWriter("../logs/vgg19/5class2/")
 
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))
@@ -78,7 +78,7 @@ for i in range(epoch):
     model.eval()
     total_test_loss = 0
     total_accuracy = 0
-    # 创建一个n * n的矩阵，用于记录预测结果
+    # 创建一个10 * 10的矩阵，用于记录预测结果
     confusion_matrix = torch.zeros(class_nums, class_nums, dtype=torch.int64)
 
     with torch.no_grad():
@@ -119,16 +119,18 @@ for i in range(epoch):
         frr = (confusion_matrix[k, :].sum() - confusion_matrix[k][k]) / confusion_matrix[k, :].sum()
         precisions.append(precision)
         recalls.append(recall)
-
+        frrs.append(frr)
 
     # 计算平均Precision, Recall, Frr
     avg_precision = sum(precisions) / len(precisions)
     avg_recall = sum(recalls) / len(recalls)
     avg_frr = sum(frrs) / len(frrs)
 
-    # 计算F1
+    # 计算F1-score
     avg_f1 = 2 * avg_precision * avg_recall / (avg_precision + avg_recall)
-    print("第{}轮测试，平均Precision为{}, 平均Recall为{}, 平均F1-score为{},平均FRR为{}".format(i + 1, avg_precision, avg_recall, avg_f1, avg_frr))
+    print("第{}轮测试，平均Precision为{}, 平均Recall为{}, 平均F1-score为{},平均FRR为{}".format(i + 1, avg_precision,
+                                                                                              avg_recall, avg_f1,
+                                                                                              avg_frr))
     writer.add_scalar("Precision", avg_precision, total_test_step)
     writer.add_scalar("Recall", avg_recall, total_test_step)
     writer.add_scalar("F1", avg_f1, total_test_step)
@@ -143,7 +145,8 @@ for i in range(epoch):
 
     # 保存模型
     if i % 10 == 0:
-        torch.save(model.state_dict(), "../model/vgg16/vgg16__{}.pth".format(i))
+        torch.save(model.state_dict(), "../model/vgg19/vgg19_{}.pth".format(i))
     print("\n")
 
 writer.close()
+
