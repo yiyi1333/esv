@@ -25,7 +25,7 @@ test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # 准备模型VGG
 model = torchvision.models.vgg16(pretrained=True)
-model.classifier[6] = torch.nn.Linear(4096, 5, bias=True)
+model.classifier[6] = torch.nn.Linear(4096, 10, bias=True)
 # model = VGG_16.VGG16_3()
 # 模型放入GPU
 if gpu_available:
@@ -42,10 +42,10 @@ optimzer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 # 训练
 total_train_step = 0
 total_test_step = 0
-epoch = 100
+epoch = 101
 
 # tensorboard, 指定日志名称
-writer = SummaryWriter("../logs/vgg16_3/")
+writer = SummaryWriter("../logs/vgg16_3/5class2/")
 
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))

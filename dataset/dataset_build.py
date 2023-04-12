@@ -54,7 +54,7 @@ def build(genuine_num, forgery_num):
     for filename in image_list:
         if filename.endswith(".jpg") or filename.endswith(".png"):
             num = filename.split('_')[0]
-            # 过滤num > 005 的数据
+            # 过滤num > 0xx 的数据
             if (int(num) > 5):
                 continue
 
@@ -79,12 +79,12 @@ def build(genuine_num, forgery_num):
 
             if(genuine_map[num] <= genuine_num):
                 train_images.append(image)
-                # train_labels.append((int(num) - 1) * 2)
-                train_labels.append(int(num) - 1)
+                train_labels.append((int(num) - 1) * 2)
+                # train_labels.append(int(num) - 1)
             else:
                 test_images.append(image)
-                # test_labels.append((int(num) - 1) * 2)
-                test_labels.append(int(num) - 1)
+                test_labels.append((int(num) - 1) * 2)
+                # test_labels.append(int(num) - 1)
 
             print(filename, 'label:', (int(num) - 1))
 
@@ -95,7 +95,7 @@ def build(genuine_num, forgery_num):
         if filename.endswith(".jpg") or filename.endswith(".png"):
             num = filename.split('_')[0][-3:]
 
-            # 过滤num > 005 的数据
+            # 过滤num > 0xx 的数据
             if (int(num) > 5):
                 continue
 
@@ -118,12 +118,12 @@ def build(genuine_num, forgery_num):
                 forgery_map[num] += 1
             if(forgery_map[num] <= forgery_num):
                 train_images.append((image))
-                # train_labels.append((int(num) - 1) * 2 + 1)
-                train_labels.append(int(num) - 1)
+                train_labels.append((int(num) - 1) * 2 + 1)
+                # train_labels.append(int(num) - 1)
             else:
                 test_images.append((image))
-                # test_labels.append((int(num) - 1) * 2 + 1)
-                test_labels.append(int(num) - 1)
+                test_labels.append((int(num) - 1) * 2 + 1)
+                # test_labels.append(int(num) - 1)
             print(filename, 'label:', (int(num) - 1))
 
     # 生成数据集
@@ -139,18 +139,18 @@ def build(genuine_num, forgery_num):
         ]))
 
     # 保存数据
-    with open("sigComp2011_train_dataset_chinese.pkl", "wb") as f:
+    with open("sigComp2011_train_dataset_chinese_5class2.pkl", "wb") as f:
         pickle.dump(train_dataset, f)
-    with open("sigComp2011_test_dataset_chinese.pkl", "wb") as f:
+    with open("sigComp2011_test_dataset_chinese_5class2.pkl", "wb") as f:
         pickle.dump(test_dataset, f)
 
 def load(data_dir, train = True):
     if(train):
-        with open(data_dir + '/sigComp2011_train_dataset_chinese.pkl', "rb") as f:
+        with open(data_dir + '/sigComp2011_train_dataset_chinese_5class2.pkl', "rb") as f:
             train_dataset = pickle.load(f)
         return train_dataset
     else:
-        with open(data_dir + '/sigComp2011_test_dataset_chinese.pkl', "rb") as f:
+        with open(data_dir + '/sigComp2011_test_dataset_chinese_5class2.pkl', "rb") as f:
             test_dataset = pickle.load(f)
         return test_dataset
 
