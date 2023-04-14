@@ -33,21 +33,20 @@ gpu_available = torch.cuda.is_available()
 
 # 准备模型VGG
 model = torchvision.models.vgg16(pretrained=False)
-model.classifier[6] = torch.nn.Linear(4096, 5, bias=True)
+model.classifier[6] = torch.nn.Linear(4096, 10, bias=True)
 # 加载参数
-model.load_state_dict(torch.load('../model/result/vgg16_5.pth'))
+model.load_state_dict(torch.load('../model/result/vgg16_5_2_1.pth'))
 if gpu_available:
     model = model.cuda()
 
 # 推理模式
 model.eval()
 
-image = pre_progress('../dataset/images/001/001_001.png')
+image = pre_progress('../001_1.png')
 # 进行推理
 if gpu_available:
     image = image.cuda()
 result = model(image)
+result = torch.softmax(result, dim=1)
 
 print(result)
-# 打印结果中最大的值
-print(torch.max(result, 1))
