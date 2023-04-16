@@ -12,7 +12,7 @@ if __name__ == '__main__':
         imgs, targets = data
         imgs = imgs[0]
         print(imgs)
-        # imgs从tensor 转为 PIL.Image
+        # imgs 从 tensor 转为 PIL.Image
         pil_image = ToPILImage()(imgs)
         pil_image.show()
         print(targets)
