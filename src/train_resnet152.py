@@ -2,12 +2,13 @@ import torch.cuda
 import torchvision
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
+from torchvision.models import GoogLeNet_Weights
 
 from dataset import dataset_build
 from net import VGG_16
 
 # 超参
-batch_size = 64 # 一次训练的样本数
+batch_size = 50 # 一次训练的样本数
 learning_rate = 0.001 # 学习率
 class_nums = 10 # 分类数
 
@@ -25,8 +26,8 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # 准备模型VGG
-model = torchvision.models.vgg19(pretrained=True)
-model.classifier[6] = torch.nn.Linear(4096, class_nums, bias=True)
+model = torchvision.models.resnet152(pretrained=True)
+model.fc = torch.nn.Linear(2048, class_nums, bias=True)
 
 # 模型放入GPU
 if gpu_available:
@@ -46,7 +47,7 @@ total_test_step = 0
 epoch = 101
 
 # tensorboard, 指定日志名称
-writer = SummaryWriter("../logs/googlenet_v3/5class2/")
+writer = SummaryWriter("../logs/resnet152/5class2/")
 
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))
@@ -145,7 +146,7 @@ for i in range(epoch):
 
     # 保存模型
     if i % 10 == 0:
-        torch.save(model.state_dict(), "../model/googlenet_v1/googlenet_v1_{}.pth".format(i))
+        torch.save(model.state_dict(), "../model/resnet152/resnet152_{}.pth".format(i))
     print("\n")
 
 writer.close()

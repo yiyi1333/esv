@@ -16,4 +16,4 @@ if __name__ == '__main__':
         pil_image = ToPILImage()(imgs)
         pil_image.show()
         print(targets)
-        # break
+        break

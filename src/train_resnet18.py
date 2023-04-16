@@ -26,8 +26,8 @@ train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
 # 准备模型VGG
-model = torchvision.models.googlenet(weights=GoogLeNet_Weights.IMAGENET1K_V1)
-model.fc = torch.nn.Linear(1024, class_nums, bias=True)
+model = torchvision.models.resnet18(pretrained=True)
+model.fc = torch.nn.Linear(512, class_nums, bias=True)
 
 # 模型放入GPU
 if gpu_available:
@@ -47,7 +47,7 @@ total_test_step = 0
 epoch = 101
 
 # tensorboard, 指定日志名称
-writer = SummaryWriter("../logs/googlenet_v1/5class2/")
+writer = SummaryWriter("../logs/resnet18/5class2/")
 
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))
@@ -146,7 +146,7 @@ for i in range(epoch):
 
     # 保存模型
     if i % 10 == 0:
-        torch.save(model.state_dict(), "../model/googlenet_v1/googlenet_v1_{}.pth".format(i))
+        torch.save(model.state_dict(), "../model/resnet18/resnet18_{}.pth".format(i))
     print("\n")
 
 writer.close()

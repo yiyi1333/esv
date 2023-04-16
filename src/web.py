@@ -19,6 +19,7 @@ def get_image(imageurl):
     image = Image.open(BytesIO(req.content))
     image.save(filename)
     return filename
+
 @app.route("/vgg16", methods=['POST'])
 def vgg16():
     # 调用vgg16模型进行推理
@@ -53,14 +54,12 @@ def vgg16():
     # 将result中的结果重新计算成和为1的置信度
     result = torch.softmax(result, dim=1)
     # 将result中的结果保留两位小数
-    result = torch.round(result * 100) / 100
-    print(result)
+    # result = torch.round(result * 100) / 100
+    # print(result)
     # 将结果转换成json格式
     result = result.tolist()
     result = json.dumps(result)
-
-
-
+    print(result)
     # 返回推理结果
     return result
 

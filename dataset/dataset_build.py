@@ -9,6 +9,8 @@ import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.transforms import transforms
 
+# 数据集
+image_size = 299
 
 class SigComp2011_Dataset_Chinese(Dataset):
     def __init__(self, images, labels, train=True, transform=None):
@@ -70,7 +72,7 @@ def build(genuine_num, forgery_num):
             image = ImageOps.pad(image, (edge, edge), color=(255, 255, 255))
             # resize 为224 * 224 双线性插值方法
 
-            image = image.resize((224, 224))
+            image = image.resize((image_size, image_size))
             # totensor
             image = tran(image)
             # 通道压缩
@@ -105,7 +107,7 @@ def build(genuine_num, forgery_num):
             edge = max(image.size[0], image.size[1])
             image = ImageOps.pad(image, (edge, edge), color=(255, 255, 255))
             # resize 为224 * 224
-            image = image.resize((224, 224))
+            image = image.resize((image_size, image_size))
             # totensor
             image = tran(image)
             # 通道压缩
@@ -138,19 +140,23 @@ def build(genuine_num, forgery_num):
             transforms.GaussianBlur(3, (0.1, 2.0))
         ]))
 
+    train_dataset_path = "sigComp2011_train_dataset_chinese_5class2.pkl"
+    test_dataset_path = "sigComp2011_test_dataset_chinese_5class2.pkl"
     # 保存数据
-    with open("sigComp2011_train_dataset_chinese_5class2.pkl", "wb") as f:
+    with open(train_dataset_path, "wb") as f:
         pickle.dump(train_dataset, f)
-    with open("sigComp2011_test_dataset_chinese_5class2.pkl", "wb") as f:
+    with open(test_dataset_path, "wb") as f:
         pickle.dump(test_dataset, f)
 
 def load(data_dir, train = True):
+    train_dataset_path = "sigComp2011_train_dataset_chinese_5class2.pkl"
+    test_dataset_path = "sigComp2011_test_dataset_chinese_5class2.pkl"
     if(train):
-        with open(data_dir + '/sigComp2011_train_dataset_chinese_5class2.pkl', "rb") as f:
+        with open(data_dir + '/' + train_dataset_path, "rb") as f:
             train_dataset = pickle.load(f)
         return train_dataset
     else:
-        with open(data_dir + '/sigComp2011_test_dataset_chinese_5class2.pkl', "rb") as f:
+        with open(data_dir + '/' + test_dataset_path, "rb") as f:
             test_dataset = pickle.load(f)
         return test_dataset
 
