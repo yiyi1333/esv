@@ -27,6 +27,7 @@ def vgg16():
     modelId = data['modelId']
     imageurl = data['imageUrl']
 
+    print('imageUrl' + imageurl)
     # 从通过url获取图片
     imagepath = get_image(imageurl)
 
