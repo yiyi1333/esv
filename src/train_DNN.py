@@ -1,11 +1,12 @@
+import os
+
 import torch.cuda
 import torchvision
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from torchvision.models import GoogLeNet_Weights
 
 from dataset import dataset_build
-from net import VGG_16
+from net import VGG_16, DNN
 
 # 超参
 batch_size = 64 # 一次训练的样本数
@@ -25,13 +26,28 @@ test_dataset = dataset_build.load("../dataset", False)
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=True)
 
-# 准备模型googlenet
-model = torchvision.models.googlenet(weights=GoogLeNet_Weights.IMAGENET1K_V1)
-model.fc = torch.nn.Linear(1024, class_nums, bias=True)
+# 准备模型VGG
+vgg16 = torchvision.models.vgg16(pretrained=True)
+vgg16.classifier[6] = torch.nn.Linear(4096, class_nums, bias=True)
+# 加载预训练参数
+vgg16.load_state_dict(torch.load("../model/result/vgg16_5_2.pth"))
+# 准备模型GoogleNet
+google_net = torchvision.models.googlenet(pretrained=True)
+google_net.fc = torch.nn.Linear(1024, class_nums, bias=True)
+google_net.load_state_dict(torch.load("../model/result/googlenet_v1_5_2.pth"))
+# 准备模型ResNet
+res_net = torchvision.models.resnet18(pretrained=True)
+res_net.fc = torch.nn.Linear(512, class_nums, bias=True)
+res_net.load_state_dict(torch.load("../model/result/resnet18_5_2.pth"))
+# 准备主干网络
+dnn = DNN.DNN()
 
 # 模型放入GPU
 if gpu_available:
-    model = model.cuda()
+    vgg16 = vgg16.cuda()
+    google_net = google_net.cuda()
+    res_net = res_net.cuda()
+    dnn = dnn.cuda()
 
 # 损失函数： 交叉熵损失函数
 loss_func = torch.nn.CrossEntropyLoss()
@@ -39,7 +55,7 @@ if gpu_available:
     loss_func = loss_func.cuda()
 
 # 优化器
-optimzer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+optimzer = torch.optim.SGD(dnn.parameters(), lr=learning_rate)
 
 # 训练
 total_train_step = 0
@@ -47,20 +63,27 @@ total_test_step = 0
 epoch = 101
 
 # tensorboard, 指定日志名称
-writer = SummaryWriter("../logs/googlenet_v1/5class2/")
+writer = SummaryWriter("../logs/dnn/")
 
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))
 
     # 训练过程
-    model.train()
+    dnn.train()
     for data in train_loader:
         imgs, targets = data
         if gpu_available:
             imgs = imgs.cuda()
             targets = targets.cuda()
-        # print(targets)
-        outputs = model(imgs)
+
+        vgg16_features = vgg16(imgs)
+        google_net_features = google_net(imgs)
+        res_net_features = res_net(imgs)
+        # 将上述三个网络的特征拼接起来
+        features = torch.cat((vgg16_features, google_net_features, res_net_features), 1)
+        # print('vgg16 shape: ' + str(vgg16_features.size()))
+        # print('concat shape: ' + str(features.size()))
+        outputs = dnn(features)
         loss = loss_func(outputs, targets)
 
         # 反向传播
@@ -76,10 +99,10 @@ for i in range(epoch):
             writer.add_scalar("train_loss", loss.item(), total_train_step)
 
     # 测试过程
-    model.eval()
+    dnn.eval()
     total_test_loss = 0
     total_accuracy = 0
-    # 创建一个10 * 10的矩阵，用于记录预测结果
+    # 创建一个n * n的矩阵，用于记录预测结果
     confusion_matrix = torch.zeros(class_nums, class_nums, dtype=torch.int64)
 
     with torch.no_grad():
@@ -88,7 +111,14 @@ for i in range(epoch):
             if gpu_available:
                 imgs = imgs.cuda()
                 targets = targets.cuda()
-            outputs = model(imgs)
+
+            vgg16_features = vgg16(imgs)
+            google_net_features = google_net(imgs)
+            res_net_features = res_net(imgs)
+            # 将上述三个网络的特征拼接起来
+            features = torch.cat((vgg16_features, google_net_features, res_net_features), 1)
+            # print(targets)
+            outputs = dnn(features)
             # loss
             loss = loss_func(outputs, targets)
             total_test_loss += loss.item()
@@ -120,18 +150,25 @@ for i in range(epoch):
         frr = (confusion_matrix[k, :].sum() - confusion_matrix[k][k]) / confusion_matrix[k, :].sum()
         precisions.append(precision)
         recalls.append(recall)
-        frrs.append(frr)
+
 
     # 计算平均Precision, Recall, Frr
-    avg_precision = sum(precisions) / len(precisions)
-    avg_recall = sum(recalls) / len(recalls)
-    avg_frr = sum(frrs) / len(frrs)
+    if len(precisions) == 0:
+        avg_precision = 0
+    else:
+        avg_precision = sum(precisions) / len(precisions)
+    if len(recalls) == 0:
+        avg_recall = 0
+    else:
+        avg_recall = sum(recalls) / len(recalls)
+    if len(frrs) == 0:
+        avg_frr = 0
+    else:
+        avg_frr = sum(frrs) / len(frrs)
 
-    # 计算F1-score
+    # 计算F1
     avg_f1 = 2 * avg_precision * avg_recall / (avg_precision + avg_recall)
-    print("第{}轮测试，平均Precision为{}, 平均Recall为{}, 平均F1-score为{},平均FRR为{}".format(i + 1, avg_precision,
-                                                                                              avg_recall, avg_f1,
-                                                                                              avg_frr))
+    print("第{}轮测试，平均Precision为{}, 平均Recall为{}, 平均F1-score为{},平均FRR为{}".format(i + 1, avg_precision, avg_recall, avg_f1, avg_frr))
     writer.add_scalar("Precision", avg_precision, total_test_step)
     writer.add_scalar("Recall", avg_recall, total_test_step)
     writer.add_scalar("F1", avg_f1, total_test_step)
@@ -143,11 +180,12 @@ for i in range(epoch):
     writer.add_scalar("test_loss", total_test_loss, total_test_step)
     writer.add_scalar("test_acc", total_accuracy / len(test_dataset), total_test_step)
 
-
+    # 如果目录不存在，则创建目录
+    if not os.path.exists('../model/dnn/'):
+        os.makedirs('../model/dnn/')
     # 保存模型
     if i % 10 == 0:
-        torch.save(model.state_dict(), "../model/googlenet_v1/googlenet_v1_{}.pth".format(i))
+        torch.save(dnn.state_dict(), "../model/dnn/dnn__{}.pth".format(i))
     print("\n")
 
 writer.close()
-
