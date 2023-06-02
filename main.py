@@ -5,30 +5,18 @@ import torch
 import torchvision
 from PIL import Image
 
-# def get_image(imageurl):
-#     # 从通过http获取图片
-#     proxies = {"http": None, "https": None}
-#     req = requests.get(imageurl, verify=False, proxies=proxies)
-#     filename = imageurl.split('/')[-1]
-#     image = Image.open(BytesIO(req.content))
-#     # image.save(filename)
-#     return image
-#
-# imageurl = 'https://yiyi-picture.oss-cn-hangzhou.aliyuncs.com/Typora/001_1.png'
-# # 从通过http获取图片
-# proxies = { "http": None, "https": None }
-# req = requests.get(imageurl, verify=False, proxies=proxies)
-# filename = imageurl.split('/')[-1]
-# image = Image.open(BytesIO(req.content))
-# image.show()
-# image.save(filename)
+def get_file(file_url):
+    # 从通过http获取图片
+    proxies = {"http": None, "https": None}
+    req = requests.get(file_url, verify=False, proxies=proxies)
+    filename = '../temp/' +  file_url.split('/')[-1]
+    # 保存文件
+    with open(filename, 'wb') as f:
+        f.write(req.content)
+    return filename
 
-model = torchvision.models.densenet201(pretrained=False)
-print(model)
-# model.fc = torch.nn.Linear(512, 10, bias=True)
-# print(model.fc)
-# model.fc = torch.nn.Linear(2048, 10, bias=True)
-# print(model)
+
+get_file('https://yiyi-picture.oss-cn-hangzhou.aliyuncs.com/image/2023-05-20-15-36-24.679117400-new-test-X.npy')
 
 
 

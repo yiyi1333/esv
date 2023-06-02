@@ -46,7 +46,7 @@ total_test_step = 0
 epoch = 101
 
 # tensorboard, 指定日志名称
-writer = SummaryWriter("../logs/vgg16/5class2/")
+writer = SummaryWriter("../logs/vgg16/5class2/temp")
 
 for i in range(epoch):
     print("--------------------第{}轮训练开始-------------------".format(i + 1))
@@ -124,15 +124,15 @@ for i in range(epoch):
     # 计算平均Precision, Recall, Frr
     avg_precision = sum(precisions) / len(precisions)
     avg_recall = sum(recalls) / len(recalls)
-    avg_frr = sum(frrs) / len(frrs)
+    # avg_frr = sum(frrs) / len(frrs)
 
     # 计算F1
     avg_f1 = 2 * avg_precision * avg_recall / (avg_precision + avg_recall)
-    print("第{}轮测试，平均Precision为{}, 平均Recall为{}, 平均F1-score为{},平均FRR为{}".format(i + 1, avg_precision, avg_recall, avg_f1, avg_frr))
+    print("第{}轮测试，平均Precision为{}, 平均Recall为{}, 平均F1-score为{}".format(i + 1, avg_precision, avg_recall, avg_f1))
     writer.add_scalar("Precision", avg_precision, total_test_step)
     writer.add_scalar("Recall", avg_recall, total_test_step)
     writer.add_scalar("F1", avg_f1, total_test_step)
-    writer.add_scalar("FRR", avg_frr, total_test_step)
+    # writer.add_scalar("FRR", avg_frr, total_test_step)
 
     # 记录测试损失
     print("第{}轮测试，损失为{}".format(i + 1, total_test_loss))

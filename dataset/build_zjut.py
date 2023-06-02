@@ -12,7 +12,7 @@ from torchvision.transforms import transforms
 # 数据集
 image_size = 299
 
-class SigComp2011_Dataset_Chinese(Dataset):
+class Eszjut2023(Dataset):
     def __init__(self, images, labels, train=True, transform=None):
         self.labels = labels
         self.train = train
@@ -41,13 +41,13 @@ def build(genuine_num, forgery_num):
     # 数据路径
     # images_dir_forgery = '../images/Sig2011/Forgery'
     # images_dir_genuine = '../images/Sig2011/Genuine'
-    images_dir_forgery = '../images/Sig2011_enhancement/Forgery'
-    images_dir_genuine = '../images/Sig2011_enhancement/Genuine'
+    images_dir_forgery = '../images/Eszjut2023_enhancement/Forgery'
+    images_dir_genuine = '../images/Eszjut2023_enhancement/Genuine'
     # 读取数据, 生成数据集存储到本地
     # 真实签名
     image_list = os.listdir(images_dir_genuine)
     # 列表升序排序
-    image_list.sort(key=lambda x: (int(x.split('_')[0]), int(x.split('_')[1].split('.')[0])))
+    # image_list.sort(key=lambda x: (int(x.split('_')[0]), int(x.split('_')[1].split('.')[0])))
     print(image_list)
 
     train_images = []
@@ -59,9 +59,6 @@ def build(genuine_num, forgery_num):
     for filename in image_list:
         if filename.endswith(".jpg") or filename.endswith(".png"):
             num = filename.split('_')[0]
-            # 过滤num > 0xx 的数据
-            if (int(num) > 5):
-                continue
 
             # 使用 Image.open() 方法打开图片并将其添加到列表中
             image = Image.open(os.path.join(images_dir_genuine, filename))
@@ -97,19 +94,14 @@ def build(genuine_num, forgery_num):
 
     # 伪造签名
     image_list = os.listdir(images_dir_forgery)
-    image_list.sort(key=lambda x: (int(x.split('_')[0]), int(x.split('_')[1].split('.')[0])))
+    # image_list.sort(key=lambda x: (int(x.split('_')[0]), int(x.split('_')[1].split('.')[0])))
     print(image_list)
 
     forgery_map = {}
     for filename in image_list:
         if filename.endswith(".jpg") or filename.endswith(".png"):
-            num = filename.split('_')[0][-3:]
+            num = filename.split('_')[0]
 
-            # 过滤num > 0xx 的数据
-            if (int(num) > 5):
-                continue
-
-            # 取字符串label的最后三个字符
             image = Image.open(os.path.join(images_dir_forgery, filename))
             # Image，以原图为中心，填充为正方形，使用白色填充
             edge = max(image.size[0], image.size[1])
@@ -139,19 +131,19 @@ def build(genuine_num, forgery_num):
             # print(filename, 'label:', (int(num) - 1))
 
     # 生成数据集
-    train_dataset = SigComp2011_Dataset_Chinese(train_images, train_labels, True, transforms.Compose([
+    train_dataset = Eszjut2023(train_images, train_labels, True, transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.5,), (0.5,)),
             transforms.GaussianBlur(3, (0.1, 2.0))
         ]))
-    test_dataset = SigComp2011_Dataset_Chinese(test_images, test_labels,  False, transforms.Compose([
+    test_dataset = Eszjut2023(test_images, test_labels,  False, transforms.Compose([
             transforms.ToTensor(),
             transforms.Normalize((0.5,), (0.5,)),
             transforms.GaussianBlur(3, (0.1, 2.0))
         ]))
 
-    train_dataset_path = "sigComp2011_train_dataset_chinese_5class2.pkl"
-    test_dataset_path = "sigComp2011_test_dataset_chinese_5class2.pkl"
+    train_dataset_path = "eszjut2023_train_dataset.pkl"
+    test_dataset_path = "eszjut2023_test_dataset.pkl"
     # 保存数据
     with open(train_dataset_path, "wb") as f:
         pickle.dump(train_dataset, f)
@@ -169,5 +161,6 @@ def load(data_dir, train = True):
         with open(data_dir + '/' + test_dataset_path, "rb") as f:
             test_dataset = pickle.load(f)
         return test_dataset
+
 
 
